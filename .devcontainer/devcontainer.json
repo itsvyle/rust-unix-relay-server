@@ -1,6 +1,6 @@
 {
 	"name": "Rust",
-	"image": "ghcr.io/devcontainers/templates/rust:2.1.0",
+	"image": "mcr.microsoft.com/devcontainers/rust",
   "features": {
 		"ghcr.io/devcontainers/features/sshd:1": { "version": "latest" },
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
