@@ -20,5 +20,5 @@ This folder has to be specific to each instance of the container, as the socket 
 
 ```bash
 docker run -v /tmp/relay_sockets/:/tmp/sockets/ -d ghcr.io/itsvyle/rust-unix-relay-server:latest
-
+```
 You can then connect to the socket at the path `<your directory>/relay`
