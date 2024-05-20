@@ -1,6 +1,7 @@
 use tokio::net::{UnixListener, UnixStream};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::{broadcast, Mutex};
+use tokio::signal::unix::{signal, SignalKind};
 use std::sync::Arc;
 use uuid::Uuid;
 use std::env;
@@ -33,6 +34,12 @@ async fn main() -> tokio::io::Result<()> {
     // Create a broadcast channel with a buffer size of 16.
     let (tx, _rx) = broadcast::channel(16);
     let clients = Arc::new(Mutex::new(Vec::new()));
+
+
+    // Spawn a task to handle the shutdown signal
+    tokio::spawn(async  {
+        handle_shutdown_signal().await;
+    });
 
     loop {
         match listener.accept().await {
@@ -111,4 +118,25 @@ async fn handle_connection(
 
     clients.lock().await.retain(|&id| id != client_id);
     eprintln!("Client {} disconnected, now have {} clients connected", client_id, clients.lock().await.len());
+}
+
+
+async fn handle_shutdown_signal() {
+    let mut sigint = signal(SignalKind::interrupt()).expect("Failed to install SIGINT handler");
+    let mut sigterm = signal(SignalKind::terminate()).expect("Failed to install SIGTERM handler");
+    let mut sighup = signal(SignalKind::hangup()).expect("Failed to install SIGHUP handler");
+
+    tokio::select! {
+        _ = sigint.recv() => {
+            eprintln!("Received SIGINT, shutting down.");
+        }
+        _ = sigterm.recv() => {
+            eprintln!("Received SIGTERM, shutting down.");
+        }
+        _ = sighup.recv() => {
+            eprintln!("Received SIGHUP, shutting down.");
+        }
+    }
+
+    std::process::exit(0);
 }
