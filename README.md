@@ -14,12 +14,11 @@ socat -d -d - UNIX-CONNECT:/tmp/relay_socket
 
 # Docker image
 
-After having cloned the image, run it by mounting a directory to the container at path `/tmp/sockets/`
+After having cloned the container, run it by mounting a directory to the container at path `/tmp/sockets/`
 
 This folder has to be specific to each instance of the container, as the socket file will be created in it with the same name.
 
 ```bash
-docker run -v /tmp/relay_sockets/:/tmp/sockets/ -d rust-unix-relay-server
-```
+docker run -v /tmp/relay_sockets/:/tmp/sockets/ -d ghcr.io/itsvyle/rust-unix-relay-server:latest
 
 You can then connect to the socket at the path `<your directory>/relay`
