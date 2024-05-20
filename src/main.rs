@@ -3,12 +3,23 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::{broadcast, Mutex};
 use std::sync::Arc;
 use uuid::Uuid;
+use std::env;
 
 const MAX_MESSAGE_SIZE: usize = 1024; // in bytes
 
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
-    let path = "/tmp/relay_socket";
+    let debug = cfg!(debug_assertions);
+    let path: &str;
+    let args: Vec<String> = env::args().collect();
+    if debug && args.len() == 1 {
+        path = "/tmp/relay_socket";
+    } else if args.len() != 2 {
+        eprintln!("Usage: {} <socket_path>", args[0]);
+        std::process::exit(1);
+    } else {
+        path = &args[1][..];
+    }
     let _ = std::fs::remove_file(path); // remove old one
     let listener = UnixListener::bind(path)?;
     eprintln!("Listening on: {:?} at socket path {}", listener.local_addr()?, path);
