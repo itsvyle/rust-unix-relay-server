@@ -16,6 +16,8 @@ socat -d -d - UNIX-CONNECT:/tmp/relay_socket
 
 After having cloned the image, run it by mounting a directory to the container at path `/tmp/sockets/`
 
+This folder has to be specific to each instance of the container, as the socket file will be created in it with the same name.
+
 ```bash
 docker run -v /tmp/relay_sockets/:/tmp/sockets/ -d rust-unix-relay-server
 ```
