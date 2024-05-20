@@ -4,6 +4,7 @@ use tokio::sync::{broadcast, Mutex};
 use std::sync::Arc;
 use uuid::Uuid;
 use std::env;
+use std::os::unix::fs::PermissionsExt;
 
 const MAX_MESSAGE_SIZE: usize = 1024; // in bytes
 
@@ -23,6 +24,11 @@ async fn main() -> tokio::io::Result<()> {
     let _ = std::fs::remove_file(path); // remove old one
     let listener = UnixListener::bind(path)?;
     eprintln!("Listening on: {:?} at socket path {}", listener.local_addr()?, path);
+    // Give perms to anyone to connect
+    if let Err(e) = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o777)) {
+        eprintln!("Failed to set permissions on socket file: {:?}", e);
+    }
+    
 
     // Create a broadcast channel with a buffer size of 16.
     let (tx, _rx) = broadcast::channel(16);

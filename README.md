@@ -11,3 +11,13 @@ Test it by running:
 ```bash
 socat -d -d - UNIX-CONNECT:/tmp/relay_socket
 ```
+
+# Docker image
+
+After having cloned the image, run it by mounting a directory to the container at path `/tmp/sockets/`
+
+```bash
+docker run -v /tmp/relay_sockets/:/tmp/sockets/ -d rust-unix-relay-server
+```
+
+You can then connect to the socket at the path `<your directory>/relay`
